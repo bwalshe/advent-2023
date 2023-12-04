@@ -5,15 +5,11 @@ import Data.Text (Text, pack, replace)
 import Data.Text qualified as T
 import Data.Text.IO qualified as TIO
 import System.Environment
-import Text.Show
 
 extractNum :: Text -> Int
 extractNum s =
   let nums = T.filter isDigit s
    in read $ [T.head, T.last] <*> [nums]
-
-sumCodes :: Text -> Int
-sumCodes = sum . fmap (extractNum . normalise) . T.lines
 
 normalise :: Text -> Text
 normalise =
@@ -24,6 +20,6 @@ normalise =
 
 main :: IO ()
 main = do
-  (fileName : _) <- getArgs
+  fileName <- head <$> getArgs
   rawData <- TIO.readFile fileName
   print $ sum $ extractNum . normalise <$> T.lines rawData
