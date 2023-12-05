@@ -1,9 +1,12 @@
 {-# LANGUAGE OverloadedStrings #-}
 
+module Day1 (extractNum, normalise, firstTask, secondTask) where
+
 import Data.Char
+import Data.Int (Int)
 import Data.Text (Text, pack, replace)
-import Data.Text qualified as T
-import Data.Text.IO qualified as TIO
+import qualified Data.Text as T
+import qualified Data.Text.IO as TIO
 import System.Environment
 
 extractNum :: Text -> Int
@@ -16,10 +19,13 @@ normalise =
   let words = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
       makePair (w, n) = (w, w <> pack (show n) <> w)
       pairs = makePair <$> zip words [1 ..]
-   in foldr (.) id $ fmap (uncurry replace) pairs
+   in foldr (.) id $ uncurry replace <$> pairs
 
-main :: IO ()
-main = do
-  fileName <- head <$> getArgs
-  rawData <- TIO.readFile fileName
-  print $ sum $ extractNum . normalise <$> T.lines rawData
+runAndSum :: (Text -> Int) -> Text -> Int
+runAndSum f = sum . fmap f . T.lines
+
+firstTask :: Text -> Int
+firstTask = runAndSum extractNum
+
+secondTask :: Text -> Int
+secondTask = runAndSum (extractNum . normalise)
