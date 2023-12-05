@@ -6,8 +6,6 @@ import Data.Char
 import Data.Int (Int)
 import Data.Text (Text, pack, replace)
 import qualified Data.Text as T
-import qualified Data.Text.IO as TIO
-import System.Environment
 
 extractNum :: Text -> Int
 extractNum s =
