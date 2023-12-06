@@ -17,11 +17,8 @@ module Day2
 where
 
 import Data.Text
-import Data.Text.IO as TIO
 import qualified Data.Text.IO as TIO
 import Data.Void
-import GHC.IO.Handle (BufferMode (BlockBuffering))
-import GHC.Stats (GCDetails (gcdetails_compact_bytes))
 import Text.Megaparsec
 import Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer as L
