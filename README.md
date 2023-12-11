@@ -12,7 +12,7 @@ about my experience using Haskell - I want to see how it stacks up against
 the experience of using something more mainstream like Java.
 
 The way this project is structured is that I have my solutions in the 
-`DayN.hs` files in the [libs/](libs/) folder and the 
+`DayN.hs` files in the [lib/](lib/) folder and the 
 [app/Main.hs](app/Main.hs) just runs whichever puzzle I have solved most 
 recently. If all you want is to see how I solved the puzzles, them you 
 are best off just looking at the daily `.hs` files. If you want to know
@@ -61,7 +61,7 @@ Today's challenge revolved around parsing out some information and then doing
 a calculation based on this. I was actually super-interested in this kind of
 problem, as I have worked a bit with parsing before using grammars, but hadn't 
 done things the Haskell way with combinators. Today's task gave me an opportunity
-to finally give [Megaparsec]() a go.
+to finally give [Megaparsec](https://hackage.haskell.org/package/megaparsec) a go.
 
 I'm going to be honest, I really struggled getting started with this one. I think
 my biggest problem is that the docs assume you already have a good handle of 
