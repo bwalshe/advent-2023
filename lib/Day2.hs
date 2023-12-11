@@ -24,10 +24,21 @@ import Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer as L
 import Text.Megaparsec.Error
 
+-- The goal for today is to parse out information about draws of colored balls
+-- from a bag, so that you can make estimates about how many balls area  actually
+-- in the bag
+
 type Parser = Parsec Void Text
+
+-------------------------------------------------------------------------------
+-- Data Structures                                                            -
+-------------------------------------------------------------------------------
 
 data Color = Red | Green | Blue deriving (Eq, Show)
 
+-- This represents a sample taken from a bag with red, green and blue balls
+-- They form a semigroup because you can add two Counts together
+-- They form a monoid as the empty count exists
 data Count = Count
   { red :: Int,
     green :: Int,
@@ -41,6 +52,7 @@ instance Semigroup Count where
 instance Monoid Count where
   mempty = Count 0 0 0
 
+-- A Game just consists of a list of draws from the bag
 data Game = Game
   { number :: Int,
     draws :: [Count]
@@ -51,6 +63,10 @@ makeCount :: Color -> Int -> Count
 makeCount Red n = Count n 0 0
 makeCount Green n = Count 0 n 0
 makeCount Blue n = Count 0 0 n
+
+-------------------------------------------------------------------------------
+-- Parsing                                                                   --
+-------------------------------------------------------------------------------
 
 pColor :: Parser Color
 pColor =
@@ -80,6 +96,10 @@ pGame = do
 
 parseGames :: String -> Text -> Either (ParseErrorBundle Text Void) [Game]
 parseGames = runParser (many (pGame <* char '\n') <* many newline)
+
+-------------------------------------------------------------------------------
+-- functions for solving the tasks                                           --
+-- ----------------------------------------------------------------------------
 
 testDraw :: Int -> Int -> Int -> Count -> Bool
 testDraw r g b count = (red count <= r) && (green count <= g) && (blue count <= b)
