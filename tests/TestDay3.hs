@@ -33,7 +33,7 @@ testSymbolLocations =
   TestCase $
     assertEqual
       "positions"
-      (S.fromAscList [1, 4])
+      [1, 4]
       (symbolLocations ".%.1*..")
 
 testPad :: Test
@@ -66,6 +66,25 @@ testSumParts =
           (sumParts [".....", "*.1.*", "....."])
    in TestCase $ corners <> outOfBounds
 
+testFindRatios :: Test
+testFindRatios =
+  let notEnough =
+        assertEqual
+          "No Ratio found"
+          []
+          (findRatios ["1..", ".%.%", "..."])
+      tooManyForMatch =
+        assertEqual
+          "Too many numbers to form ratio"
+          []
+          (findRatios ["1..", "1$.", "1.."])
+      findPair =
+        assertEqual
+          "Exactly two numbers"
+          [(1, 1)]
+          (findRatios ["1..", ".$.", "..1"])
+   in TestCase $ notEnough <> tooManyForMatch <> findPair
+
 tests :: Test
 tests =
   TestList
@@ -74,5 +93,6 @@ tests =
       testSymbolLocations,
       testPad,
       testSliding,
-      testSumParts
+      testSumParts,
+      testFindRatios
     ]

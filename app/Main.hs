@@ -9,4 +9,4 @@ main :: IO ()
 main = do
   fileName <- Prelude.head <$> getArgs
   fileText <- TIO.readFile fileName
-  print $ Day3.task1 fileText
+  print $ Day3.task2 fileText
