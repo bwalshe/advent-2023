@@ -2,8 +2,7 @@
 
 module Day1 (extractNum, normalise, firstTask, secondTask) where
 
-import Data.Char
-import Data.Int (Int)
+import Data.Char (isDigit)
 import Data.Text (Text, pack, replace)
 import qualified Data.Text as T
 

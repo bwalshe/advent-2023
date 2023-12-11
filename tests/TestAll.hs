@@ -1,25 +1,18 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Main where
 
-import Day1
+import Data.Int (Int)
 import qualified System.Exit as Exit
 import Test.HUnit
+import qualified TestDay1
+import qualified TestDay3
 
-testExtract :: Test
-testExtract = TestCase (assertEqual "should return 12 from \"sd1vonsvj4alsn2askn\"" 12 (extractNum "sd1vonsvj4alsn2askn"))
+runMultiple :: [Test] -> IO [Counts]
+runMultiple = mapM runTestTT
 
-testNormalise :: Test
-testNormalise = TestCase (assertEqual "should return 12 from \"oneight2\"" 12 (extractNum $ normalise "oneight2"))
-
-tests :: Test
-tests =
-  TestList
-    [ TestLabel "testExtract" testExtract,
-      TestLabel "testNormalise" testNormalise
-    ]
+countFailures :: [Counts] -> Int
+countFailures = sum . fmap failures
 
 main :: IO ()
 main = do
-  result <- runTestTT tests
-  if failures result > 0 then Exit.exitFailure else Exit.exitSuccess
+  results <- runMultiple [TestDay1.tests, TestDay3.tests]
+  if countFailures results > 0 then Exit.exitFailure else Exit.exitSuccess
