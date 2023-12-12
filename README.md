@@ -109,3 +109,19 @@ just some setting in my `.cabal` file, but it's frustrating when you decide
 to take 20 mins to solve a puzzle and instead spend an hour trying to read
 the docs for cabal. 
 
+### Day 4
+Today was much more straightforward than the previous ones. Task 1 was simple
+and I have my setup more in order. I do still get irrationally frustrated
+at the `String` vs. `Text` thing, and I wasted a bit of time when writing
+unit tests as I was trying to use `parseTest` instead of `runParser` in the
+test code. This is a me problem, not a Haskell problem, as the error messages
+were actually pretty clear.
+
+Task 2 was a bit more of a challenge, as it required indexing into a list and
+this is not something that the standard Haskell lists are good at. Like an 
+idiot, I tried to work around this instead of just finding a data structure
+that allowed efficient indexing. In the end I saw sense and used the
+[Vector](https://hackage.haskell.org/package/vector) package. It's a bit 
+annoying that something like this is not part of the standard set of 
+Haskell packages, but at least it is less confusing than the `String` 
+situation. ¯\\\_(ツ)_/¯

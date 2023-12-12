@@ -10,8 +10,6 @@ import Text.Megaparsec
 import Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer as L
 
-type Parser = Parsec Void Text
-
 -------------------------------------------------------------------------------
 -- Datatypes                                                                 --
 -------------------------------------------------------------------------------
@@ -26,6 +24,8 @@ data Card = Card
 -------------------------------------------------------------------------------
 -- Parsing                                                                   --
 -------------------------------------------------------------------------------
+
+type Parser = Parsec Void Text
 
 pNumList :: Parser [Int]
 pNumList = space *> some (L.decimal <* space)
@@ -48,7 +48,7 @@ parseCards = runParser (many pCard)
 -------------------------------------------------------------------------------
 
 countMatches :: Card -> Int
-countMatches (Card _ l1 l2) = Prelude.length $ intersect l1 l2
+countMatches (Card _ l1 l2) = length $ intersect l1 l2
 
 scoreCard :: Card -> Int
 scoreCard c = case countMatches c of
@@ -64,7 +64,7 @@ countTotalCopies cards =
       table = V.fromList $ nextIndexes <$> cards
       countTotalCopies' acc current = case current of
         [] -> acc
-        _ -> countTotalCopies' (acc + Prelude.length current) $ findAllCopies table current
+        _ -> countTotalCopies' (acc + length current) $ findAllCopies table current
    in countTotalCopies' 0 [0 .. length cards - 1]
 
 runTask :: ([Card] -> Int) -> String -> Text -> Either Text Int
