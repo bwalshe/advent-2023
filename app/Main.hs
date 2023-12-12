@@ -10,6 +10,6 @@ main :: IO ()
 main = do
   fileName <- Prelude.head <$> getArgs
   fileText <- TIO.readFile fileName
-  case Day4.task1 fileName fileText of
-    Right answer -> print $ unpack answer
+  case Day4.task2 fileName fileText of
+    Right answer -> print $ show answer
     Left e -> putStrLn $ unpack e
