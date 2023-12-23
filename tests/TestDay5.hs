@@ -1,23 +1,63 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module TestDay5 (tests) where
 
+import Data.Either (fromRight)
+import Data.List (sortOn)
 import Day5
 import Test.HUnit
+import Text.ParserCombinators.ReadP (many1)
 
-testMapping :: Test
-testMapping =
-  let single =
+testMappingConstruction :: Test
+testMappingConstruction =
+  let goodInput = [((1, 2), 1), ((2, 3), 2)]
+      badInput = [((1, 3), 1), ((2, 4), 2)]
+   in TestCase $ do
         assertEqual
-          "mapVal works over s single range"
-          [97, 50, 51, 100]
-          ( mapVal [Mapping 50 98 2]
-              <$> [97 .. 100]
-          )
-      multiple =
+          "intervals do not overlap"
+          (Right goodInput)
+          (getIntervals <$> mappingFromList goodInput)
         assertEqual
-          "mapVal works over multiple ranges"
-          ([0 .. 49] ++ [52 .. 99] ++ [50, 51])
-          (mapVal [Mapping 50 98 2, Mapping 52 50 48] <$> [0 .. 99])
-   in TestCase $ single <> multiple
+          "order does not matter"
+          (Right goodInput)
+          (getIntervals <$> mappingFromList (reverse goodInput))
+        assertEqual
+          "intervals overlap"
+          (Left "overlap")
+          (mappingFromList badInput)
+
+testMonoid :: Test
+testMonoid =
+  let m1 = Mapping [((50, 98), 2), ((98, 100), -48)]
+   in TestCase $ do
+        assertEqual
+          "mempty does nothing from the left"
+          m1
+          (mempty <> m1)
+        assertEqual
+          "mempty does noting from the right"
+          m1
+          (m1 <> mempty)
+
+testStackMapping :: Test
+testStackMapping =
+  let m1 = Mapping [((50, 98), 2), ((98, 100), -48)]
+      m2 = Mapping [((0, 15), 39), ((15, 54), -15)]
+   in TestCase $
+        assertEqual
+          "stack with overlap"
+          (mapVal m2 . mapVal m1 <$> [0 .. 100])
+          (mapVal (m1 <> m2) <$> [0 .. 100])
+
+testSeedToLocation :: Test
+testSeedToLocation =
+  let m1 = Mapping [((50, 98), 2), ((98, 100), -48)]
+      m2 = Mapping [((0, 15), 39), ((15, 54), -15)]
+   in TestCase $
+        assertEqual
+          "reduce list version"
+          (mapVal m2 . mapVal m1 <$> [0 .. 100])
+          (makeSeedToLocation [m1, m2] <$> [0 .. 100])
 
 tests :: Test
-tests = TestList [testMapping]
+tests = TestList [testMappingConstruction, testMonoid, testStackMapping, testSeedToLocation]
