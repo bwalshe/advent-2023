@@ -1,9 +1,10 @@
 {-# LANGUAGE TupleSections #-}
 
-module Day7 (Card (..), Score (..), Hand, toCard, toHand, scoreHand, scoreRound, task1) where
+module Day7 (Card (..), Score (..), Hand, handToCount, toCard, toHand, scoreHand, scoreRound, task1, task2) where
 
 import Data.List (sort, sortOn)
-import Data.Map.Strict (Map, fromListWith, toDescList)
+import qualified Data.Map.Strict as Map
+import Data.Maybe (fromMaybe)
 import Data.Text (Text, lines, pack, split, unpack)
 
 data Card = Joker | Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten | Jack | Queen | King | Ace
@@ -31,28 +32,45 @@ toCardJoker c = case c of
   'T' -> Ten
   _ -> toEnum $ read [c] - 1
 
-toHand :: Text -> Hand
-toHand h = Hand $ toCard <$> unpack h
+toHand :: (Char -> Card) -> Text -> Hand
+toHand f h = Hand $ f <$> unpack h
+
+handToCount :: Hand -> Map.Map Card Int
+handToCount (Hand h) = Map.fromListWith (+) $ fmap (,1) h
+
+fixJoker :: Map.Map Card Int -> [Int]
+fixJoker m =
+  let addFront i [] = [i]
+      addFront i (h : t) = (h + i) : t
+      jokers = fromMaybe 0 $ Map.lookup Joker m
+      m' = Map.delete Joker m
+   in addFront jokers $ reverse $ sort $ snd <$> Map.toDescList m'
 
 scoreHand :: Hand -> Score
-scoreHand (Hand h) =
-  case reverse $ sort $ snd <$> toDescList (fromListWith (+) $ fmap (,1) h) of
-    [5] -> FiveOfAKind
-    [4, 1] -> FourOfAKind
-    [3, 2] -> FullHouse
-    (3 : _) -> ThreeOfAKind
-    (2 : 2 : _) -> TwoPair
-    (2 : _) -> Pair
-    (1 : _) -> Single
+scoreHand = countsToScore . fixJoker . handToCount
 
--- scoreRound :: [(Hand, Int)] -> Int
+countsToScore :: [Int] -> Score
+countsToScore l = case l of
+  [5] -> FiveOfAKind
+  [4, 1] -> FourOfAKind
+  [3, 2] -> FullHouse
+  (3 : _) -> ThreeOfAKind
+  (2 : 2 : _) -> TwoPair
+  (2 : _) -> Pair
+  (1 : _) -> Single
+  _ -> error $ show l
+
+scoreRound :: [(Hand, Int)] -> Int
 scoreRound r =
   let ordering (h, _) = (scoreHand h, h)
       ranked = snd <$> sortOn ordering r
    in sum $ uncurry (*) <$> zip [1 ..] ranked
 
-parseLine :: Text -> (Hand, Int)
-parseLine l = (\[h, b] -> (toHand h, read $ unpack b)) $ split (' ' ==) l
+parseLine :: (Char -> Card) -> Text -> (Hand, Int)
+parseLine f = (\[h, b] -> (toHand f h, read $ unpack b)) . split (' ' ==)
 
 task1 :: String -> Text -> Either Text Int
-task1 f t = Right $ scoreRound $ parseLine <$> Data.Text.lines t
+task1 f t = Right $ scoreRound $ parseLine toCard <$> Data.Text.lines t
+
+task2 :: String -> Text -> Either Text Int
+task2 f t = Right $ scoreRound $ parseLine toCardJoker <$> Data.Text.lines t
