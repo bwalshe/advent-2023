@@ -1,6 +1,6 @@
 {-# LANGUAGE TupleSections #-}
 
-module Day7 (Card (..), Score (..), Hand, handToCount, toCard, toHand, scoreHand, scoreRound, task1, task2) where
+module Day7 (Card (..), Score (..), Hand, toCard, toHand, scoreHand, scoreRound, task1, task2) where
 
 import Data.List (sort, sortOn)
 import qualified Data.Map.Strict as Map
@@ -35,30 +35,25 @@ toCardJoker c = case c of
 toHand :: (Char -> Card) -> Text -> Hand
 toHand f h = Hand $ f <$> unpack h
 
-handToCount :: Hand -> Map.Map Card Int
-handToCount (Hand h) = Map.fromListWith (+) $ fmap (,1) h
-
-fixJoker :: Map.Map Card Int -> [Int]
-fixJoker m =
-  let addFront i [] = [i]
-      addFront i (h : t) = (h + i) : t
-      jokers = fromMaybe 0 $ Map.lookup Joker m
-      m' = Map.delete Joker m
-   in addFront jokers $ reverse $ sort $ snd <$> Map.toDescList m'
-
 scoreHand :: Hand -> Score
 scoreHand = countsToScore . fixJoker . handToCount
-
-countsToScore :: [Int] -> Score
-countsToScore l = case l of
-  [5] -> FiveOfAKind
-  [4, 1] -> FourOfAKind
-  [3, 2] -> FullHouse
-  (3 : _) -> ThreeOfAKind
-  (2 : 2 : _) -> TwoPair
-  (2 : _) -> Pair
-  (1 : _) -> Single
-  _ -> error $ show l
+  where
+    handToCount (Hand h) = Map.fromListWith (+) $ fmap (,1) h
+    fixJoker m =
+      let addFront i [] = [i]
+          addFront i (h : t) = (h + i) : t
+          jokers = fromMaybe 0 $ Map.lookup Joker m
+          m' = Map.delete Joker m
+       in addFront jokers $ reverse $ sort $ snd <$> Map.toDescList m'
+    countsToScore l = case l of
+      [5] -> FiveOfAKind
+      [4, 1] -> FourOfAKind
+      [3, 2] -> FullHouse
+      (3 : _) -> ThreeOfAKind
+      (2 : 2 : _) -> TwoPair
+      (2 : _) -> Pair
+      (1 : _) -> Single
+      _ -> error $ show l
 
 scoreRound :: [(Hand, Int)] -> Int
 scoreRound r =

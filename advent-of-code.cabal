@@ -27,14 +27,15 @@ extra-source-files: CHANGELOG.md
 
 
 library advent-of-code-lib
-    exposed-modules: Day1, Day2, Day3, Day4, Day5, Day6, Day7
+    exposed-modules: Day1, Day2, Day3, Day4, Day5, Day6, Day7, Day8
     hs-source-dirs: lib
     build-depends:    
       base ^>=4.16.4.0,
       text ^>=1.2.5.0,
       containers ^>=0.6.5.1,
       megaparsec ^>=9.6.1,
-      vector ^>=0.13.1.0
+      vector ^>=0.13.1.0,
+      mtl ^>= 2.3.1
     default-language: Haskell2010
 
 test-suite tests
