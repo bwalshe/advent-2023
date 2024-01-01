@@ -3,9 +3,10 @@
 module Day8 where
 
 import Control.Arrow (left)
-import Data.List (find)
+import Data.List (find, sort)
 import qualified Data.Map.Strict as Map
 import Data.Text (Text, pack, unpack)
+import qualified Data.Text as Text
 import Data.Void (Void)
 import Text.Megaparsec
 import Text.Megaparsec.Char
@@ -63,19 +64,33 @@ parseFile = runParserSimple pFile
 -------------------------------------------------------------------------------
 -- Task
 -------------------------------------------------------------------------------
-follow :: Network -> [Direction] -> Maybe Int
-follow m = follow' m "AAA" 1
+pick :: Network -> Node -> Direction -> Maybe Node
+pick net node d = pick' d <$> Map.lookup node net
+  where
+    pick' L = fst
+    pick' R = snd
+
+follow :: Network -> Node -> (Node -> Bool) -> [Direction] -> Maybe Int
+follow m start endTest = follow' m start 1
   where
     follow' _ _ _ [] = Nothing
-    follow' m p c (h : t) = case pick h <$> Map.lookup p m of
+    follow' m p c (h : t) = case pick m p h of
       Nothing -> Nothing
-      Just "ZZZ" -> Just c
-      Just p' -> follow' m p' (c + 1) t
-      where
-        pick L = fst
-        pick R = snd
+      Just p' ->
+        if endTest p'
+          then Just c
+          else follow' m p' (c + 1) t
 
 task1 :: String -> Text -> Either Text (Maybe Int)
 task1 f t = do
   (directions, network) <- parseFile f t
-  return $ follow network $ concat $ repeat directions
+  return $ follow network "AAA" (== "ZZZ") $ concat $ repeat directions
+
+task2 :: String -> Text -> Either Text (Maybe Int)
+task2 f t = do
+  (directions, network) <- parseFile f t
+  let start = filter (\t -> Text.last t == 'A') $ Map.keys network
+  let test t = Text.last t == 'Z'
+  let repeating = concat $ repeat directions
+  let distances = mapM (\s -> follow network s test repeating) start
+  return $ foldl lcm 1 <$> distances
