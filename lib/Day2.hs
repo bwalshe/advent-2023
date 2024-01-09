@@ -18,17 +18,15 @@ where
 
 import Data.Text
 import qualified Data.Text.IO as TIO
-import Data.Void
 import Text.Megaparsec
 import Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer as L
 import Text.Megaparsec.Error
+import Util
 
 -- The goal for today is to parse out information about draws of colored balls
 -- from a bag, so that you can make estimates about how many balls area  actually
 -- in the bag
-
-type Parser = Parsec Void Text
 
 -------------------------------------------------------------------------------
 -- Data Structures                                                            -
@@ -94,8 +92,8 @@ pGame = do
   draws <- sepBy pDraw (string "; ")
   return $ Game n draws
 
-parseGames :: String -> Text -> Either (ParseErrorBundle Text Void) [Game]
-parseGames = runParser (many (pGame <* char '\n') <* many newline)
+parseGames :: Task [Game]
+parseGames = runParserSimple (many (pGame <* char '\n') <* many newline)
 
 -------------------------------------------------------------------------------
 -- functions for solving the tasks                                           --
@@ -120,8 +118,8 @@ sumMinPower =
   let power (Count r g b) = r * g * b
    in sum . fmap (power . Prelude.foldr1 maxCount . draws)
 
-task1 :: String -> Text -> Either (ParseErrorBundle Text Void) Int
+task1 :: Task Int
 task1 fileName contents = sumBadGames <$> parseGames fileName contents
 
-task2 :: String -> Text -> Either (ParseErrorBundle Text Void) Int
+task2 :: Task Int
 task2 fileName contents = sumMinPower <$> parseGames fileName contents

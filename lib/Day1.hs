@@ -5,6 +5,7 @@ module Day1 (extractNum, normalise, firstTask, secondTask) where
 import Data.Char (isDigit)
 import Data.Text (Text, pack, replace)
 import qualified Data.Text as T
+import Util
 
 extractNum :: Text -> Int
 extractNum s =
@@ -21,8 +22,8 @@ normalise =
 runAndSum :: (Text -> Int) -> Text -> Int
 runAndSum f = sum . fmap f . T.lines
 
-firstTask :: Text -> Int
-firstTask = runAndSum extractNum
+firstTask :: Task Int
+firstTask _ t = Right $ runAndSum extractNum t
 
-secondTask :: Text -> Int
-secondTask = runAndSum (extractNum . normalise)
+secondTask :: Task Int
+secondTask _ t = Right $ runAndSum (extractNum . normalise) t
