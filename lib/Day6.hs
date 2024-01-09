@@ -2,24 +2,18 @@
 
 module Day6 (gameBounds, waysToWin, task1) where
 
-import Control.Arrow (left)
 import Data.Text (Text, pack)
-import Data.Void (Void)
 import Text.Megaparsec
 import Text.Megaparsec.Char (eol, hspace1, space, space1, string)
 import Text.Megaparsec.Char.Lexer (decimal)
+import Util
 
 -------------------------------------------------------------------------------
 -- Parsing                                                                   --
 -------------------------------------------------------------------------------
 
-type Parser = Parsec Void Text
-
 pTimes :: Parser [Int]
 pTimes = label "Time" $ string "Time:" *> many (hspace1 *> decimal) <* eol
-
-runParserSimple :: Parser a -> String -> Text -> Either Text a
-runParserSimple p f t = left (pack . errorBundlePretty) (runParser p f t)
 
 pDistances :: Parser [Int]
 pDistances = label "Distance" $ string "Distance:" *> many (hspace1 *> decimal) <* eol
@@ -51,7 +45,7 @@ gameBounds t d =
 waysToWin :: (Int, Int) -> Int
 waysToWin (l, h) = h - l + 1
 
-task1 :: String -> Text -> Either Text Int
+task1 :: Task Int
 task1 f t = do
   (ts, ds) <- parseFile f t
   let countWays = waysToWin . uncurry gameBounds

@@ -7,10 +7,10 @@ import Control.Arrow (left)
 import Control.Monad (foldM, join)
 import Data.List (sortOn)
 import Data.Text (Text, pack)
-import Data.Void (Void)
 import Text.Megaparsec
 import Text.Megaparsec.Char (eol, hspace1, space, space1, string)
 import Text.Megaparsec.Char.Lexer (decimal)
+import Util
 
 -------------------------------------------------------------------------------
 -- Datatypes                                                                 --
@@ -98,8 +98,6 @@ extendBounds m1 (Just (l, h)) =
 -- Parsing                                                                   --
 -------------------------------------------------------------------------------
 
-type Parser = Parsec Void Text
-
 pSeeds :: Parser Seeds
 pSeeds = label "seeds" $ string "seeds:" *> many (hspace1 *> decimal) <* eol
 
@@ -146,9 +144,6 @@ pAlminac = label "Alminac" $ do
         temperatureToHumidity,
         humidityToLocation
       ]
-
-runParserSimple :: Parser a -> String -> Text -> Either Text a
-runParserSimple p f t = left (pack . errorBundlePretty) (runParser p f t)
 
 parseFile :: String -> Text -> Either Text (Seeds, [Mapping])
 parseFile f t =
@@ -201,13 +196,13 @@ findLowest seeds inters = firstJust $ tryMatch seeds <$> inters
 findLowestInterval :: [Interval] -> [Interval] -> Maybe Int
 findLowestInterval seeds inters = firstJust $ tryMatchInterval seeds <$> inters
 
-task1 :: String -> Text -> Either Text (Maybe Int)
+task1 :: Task (Maybe Int)
 task1 f t = do
   (s, a) <- parseFile f t
   let m = mconcat a
   return $ mapVal m <$> findLowest s (lowestIntervals m)
 
-task2 :: String -> Text -> Either Text (Maybe Int)
+task2 :: Task (Maybe Int)
 task2 f t = do
   (s, a) <- parseFile f t
   let m = mconcat a

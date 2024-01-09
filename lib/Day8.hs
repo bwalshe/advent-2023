@@ -2,14 +2,12 @@
 
 module Day8 where
 
-import Control.Arrow (left)
-import Data.List (find, sort)
 import qualified Data.Map.Strict as Map
 import Data.Text (Text, pack, unpack)
 import qualified Data.Text as Text
-import Data.Void (Void)
 import Text.Megaparsec
 import Text.Megaparsec.Char
+import Util
 
 type Node = Text
 
@@ -20,8 +18,6 @@ data Direction = L | R deriving (Eq, Show, Read)
 -------------------------------------------------------------------------------
 -- Parsing
 -------------------------------------------------------------------------------
-type Parser = Parsec Void Text
-
 pDirections :: Parser [Direction]
 pDirections = fmap (read . unpack) <$> many (string "L" <|> string "R")
 
@@ -55,9 +51,6 @@ pFile = do
   eof
   return (directions, network)
 
-runParserSimple :: Parser a -> String -> Text -> Either Text a
-runParserSimple p f t = left (pack . errorBundlePretty) (runParser p f t)
-
 parseFile :: String -> Text -> Either Text ([Direction], Network)
 parseFile = runParserSimple pFile
 
@@ -81,12 +74,12 @@ follow m start endTest = follow' m start 1
           then Just c
           else follow' m p' (c + 1) t
 
-task1 :: String -> Text -> Either Text (Maybe Int)
+task1 :: Task (Maybe Int)
 task1 f t = do
   (directions, network) <- parseFile f t
   return $ follow network "AAA" (== "ZZZ") $ concat $ repeat directions
 
-task2 :: String -> Text -> Either Text (Maybe Int)
+task2 :: Task (Maybe Int)
 task2 f t = do
   (directions, network) <- parseFile f t
   let start = filter (\t -> Text.last t == 'A') $ Map.keys network

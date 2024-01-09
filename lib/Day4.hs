@@ -5,10 +5,10 @@ module Day4 (Card (..), pNumList, pCard, task1, task2, findAllCopies) where
 import Data.List (intersect, sortOn)
 import Data.Text (Text, pack, unpack)
 import qualified Data.Vector as V
-import Data.Void
 import Text.Megaparsec
 import Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer as L
+import Util
 
 -------------------------------------------------------------------------------
 -- Datatypes                                                                 --
@@ -25,8 +25,6 @@ data Card = Card
 -- Parsing                                                                   --
 -------------------------------------------------------------------------------
 
-type Parser = Parsec Void Text
-
 pNumList :: Parser [Int]
 pNumList = space *> some (L.decimal <* space)
 
@@ -40,8 +38,8 @@ pCard = do
   char '|'
   Card n winning <$> pNumList
 
-parseCards :: String -> Text -> Either (ParseErrorBundle Text Void) [Card]
-parseCards = runParser (many pCard)
+parseCards :: String -> Text -> Either Text [Card]
+parseCards = runParserSimple (many pCard)
 
 -------------------------------------------------------------------------------
 -- functions for task                                                        --
@@ -68,12 +66,10 @@ countTotalCopies cards =
    in countTotalCopies' 0 [0 .. length cards - 1]
 
 runTask :: ([Card] -> Int) -> String -> Text -> Either Text Int
-runTask f name text = case parseCards name text of
-  Right cards -> Right $ f cards
-  Left e -> Left $ pack $ errorBundlePretty e
+runTask f name text = f <$> parseCards name text
 
-task1 :: String -> Text -> Either Text Int
+task1 :: Task Int
 task1 = runTask (sum . fmap scoreCard)
 
-task2 :: String -> Text -> Either Text Int
+task2 :: Task Int
 task2 = runTask countTotalCopies

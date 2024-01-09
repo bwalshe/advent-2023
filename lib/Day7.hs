@@ -6,6 +6,7 @@ import Data.List (sort, sortOn)
 import qualified Data.Map.Strict as Map
 import Data.Maybe (fromMaybe)
 import Data.Text (Text, lines, pack, split, unpack)
+import Util
 
 data Card = Joker | Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten | Jack | Queen | King | Ace
   deriving (Eq, Bounded, Enum, Show, Ord)
@@ -64,8 +65,8 @@ scoreRound r =
 parseLine :: (Char -> Card) -> Text -> (Hand, Int)
 parseLine f = (\[h, b] -> (toHand f h, read $ unpack b)) . split (' ' ==)
 
-task1 :: String -> Text -> Either Text Int
+task1 :: Task Int
 task1 f t = Right $ scoreRound $ parseLine toCard <$> Data.Text.lines t
 
-task2 :: String -> Text -> Either Text Int
+task2 :: Task Int
 task2 f t = Right $ scoreRound $ parseLine toCardJoker <$> Data.Text.lines t
