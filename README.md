@@ -125,3 +125,69 @@ that allowed efficient indexing. In the end I saw sense and used the
 annoying that something like this is not part of the standard set of 
 Haskell packages, but at least it is less confusing than the `String` 
 situation. ¯\\\_(ツ)_/¯
+
+### Day 5
+This is the day that broke me. The initial task was quite straightforward - 
+compose a list of mapping functions together, apply the composed function
+to a list of numbers and find the lowest result. The second task was the 
+same, except now there were billions of input numbers, so mapping and then 
+sorting the results was not feasible. I actually had a good idea of how to 
+solve the problem, but my lack of Haskell experience got the better of me here.
+
+The basic idea is that a `Mapping` consists of a set of intervals and translation 
+amounts. If you had a single mapping and a very long list of numbers, and you 
+wanted to find which number in that list mapped to the lowest result, you should
+only look in the interval that maps down to the lowest values. On top of this,
+while mappings are not monotonic _over all_, within each interval they *are* 
+monotonic - meaning that you only need to find the lowest input value in the lowest
+interval. As the inputs are already sorted, this means that no sorting is needed
+at all.
+
+If you have two `Mapping`s, `m1` and `m2`, then you could combine them to form `m3`
+with a new set of intervals and translation amounts where `m3(x) == m2(m1(x))`.
+The `Mapping`s form a Monoid, and a list of mappings can be squashed down using
+`mconcat`. This means that the solution to task 2 is to first combine all the mappings, 
+find the interval that maps to the lowest output interval, and then scan through 
+for the first input that is inside that interval.
+
+Where I went wrong is that I didn't know about `mconcat`, or at least I didn't 
+know exactly which of `mconcat`, `concat`, `sequence`, or any number of other
+higher order functions I should be using. This meant I was writing a lot more
+code than I needed, doing things at a lower level of abstraction. The method of
+combining two mappings is a bit tricky, and more code means more chances to make
+mistakes.
+
+Long story short, I gave up in frustration here. About a week later (I think),
+I came back and fixed things up, but this "day" was a slog.
+
+
+### Day 6
+This was more of a maths puzzle than a coding task. The only issue worth mentioning
+here was that I did spend a bit of time scratching my head trying to understand
+how Haskell deals with converting floating point values to/from integer values.
+
+
+### Day 7
+This day's tasks involved scoring hands of a card game. This is one of those tasks
+that are very straightforward when your language has build-in pattern matching.
+
+
+### Day 8
+After two fairly easy days, here was another one that damn near killed me. Not 
+really because the task itself was difficult, but because of how I approached 
+it. 
+
+Today's task was to navigate from one point in a graph to another, and count 
+the number of steps. I decided that I really, really, really wanted to solve
+this using the `State` monad, as this is a thing I had been trying to understand
+for a while, but could never quite grasp, and this looked like a problem that 
+could be solved using state. 
+
+Long, long story short: I went off and read a book chapter about how the 
+`State` monad works. I did some practice exercises to make sure I really 
+understood what was going on. Then I came back to the AoC problem and tried 
+applying what I had learned. I spend quite a bit of time trying to force
+the State monad (actually an [RWST](https://hackage.haskell.org/package/mtl-2.3.1/docs/Control-Monad-RWS-Strict.html)
+to be precise) into my solution, but in the end I gave up and just used 
+a regular function with a very ugly signature to hold all the state as 
+normal arguments. Oh, well.
