@@ -1,20 +1,11 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TupleSections #-}
 
-module Day5
-  ( Mapping (..), -- I shouldn't export the constryctor here, but it's being used in a test
-    mappingFromList,
-    stackMapping,
-    makeSeedToLocation,
-    mapVal,
-    task1,
-    task2,
-  )
-where
+module Day5 where
 
 import Control.Arrow (left)
 import Control.Monad (foldM, join)
-import Data.List (nub, sortOn)
+import Data.List (sortOn)
 import Data.Text (Text, pack)
 import Data.Void (Void)
 import Text.Megaparsec
@@ -62,7 +53,7 @@ mappingFromList shifts =
    in fmap (Mapping . reverse) (foldM add [] (sortOn (fst . fst) shifts))
 
 {- stack mappings so that we get a new mapping that acts like values have been passed through
- - the first mapping and then the second.Mapping
+ - the first mapping and then the second mapping
  -}
 stackMapping :: Mapping -> Mapping -> Mapping
 stackMapping (Mapping m1) (Mapping m2) =
@@ -184,9 +175,6 @@ makeRanges :: [Int] -> [Interval]
 makeRanges [] = []
 makeRanges (l : r : t) = (l, l + r) : makeRanges t
 
-makeSeedToLocation :: [Mapping] -> Int -> Int
-makeSeedToLocation = mapVal . foldl stackMapping mempty
-
 minimumMay :: (Ord a, Foldable f) => f a -> Maybe a
 minimumMay l
   | null l = Nothing
@@ -207,9 +195,6 @@ firstJust [] = Nothing
 firstJust ((Just x) : t) = Just x
 firstJust (_ : t) = firstJust t
 
-orderRanges :: [Mapping] -> [Interval]
-orderRanges = lowestIntervals . foldl stackMapping mempty
-
 findLowest :: [Int] -> [Interval] -> Maybe Int
 findLowest seeds inters = firstJust $ tryMatch seeds <$> inters
 
@@ -219,11 +204,11 @@ findLowestInterval seeds inters = firstJust $ tryMatchInterval seeds <$> inters
 task1 :: String -> Text -> Either Text (Maybe Int)
 task1 f t = do
   (s, a) <- parseFile f t
-  let m = foldl (<>) mempty a
+  let m = mconcat a
   return $ mapVal m <$> findLowest s (lowestIntervals m)
 
 task2 :: String -> Text -> Either Text (Maybe Int)
 task2 f t = do
   (s, a) <- parseFile f t
-  let m = foldl (<>) mempty a
+  let m = mconcat a
   return $ mapVal m <$> findLowestInterval (makeRanges s) (lowestIntervals m)

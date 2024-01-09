@@ -49,15 +49,5 @@ testStackMapping =
           (mapVal m2 . mapVal m1 <$> [0 .. 100])
           (mapVal (m1 <> m2) <$> [0 .. 100])
 
-testSeedToLocation :: Test
-testSeedToLocation =
-  let m1 = Mapping [((50, 98), 2), ((98, 100), -48)]
-      m2 = Mapping [((0, 15), 39), ((15, 54), -15)]
-   in TestCase $
-        assertEqual
-          "reduce list version"
-          (mapVal m2 . mapVal m1 <$> [0 .. 100])
-          (makeSeedToLocation [m1, m2] <$> [0 .. 100])
-
 tests :: Test
-tests = TestList [testMappingConstruction, testMonoid, testStackMapping, testSeedToLocation]
+tests = TestList [testMappingConstruction, testMonoid, testStackMapping]

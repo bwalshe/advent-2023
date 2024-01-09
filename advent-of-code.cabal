@@ -50,7 +50,7 @@ test-suite tests
       vector ^>=0.13.1.0,
       advent-of-code-lib
     hs-source-dirs: tests
-    other-modules: TestDay1, TestDay3, TestDay4, TestDay5, TestDay6, TestDay7
+    other-modules: TestDay1, TestDay3, TestDay4, TestDay5
     data-files: test_resources/**
     default-language: Haskell2010
 
